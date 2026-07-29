@@ -6230,6 +6230,10 @@ function generatePrintView() {
     const ek_nk    = txt(`o${n}_ek_nk`);
     const ek_sp    = txt(`o${n}_ek_sp`);
     const ek_sp_vis = document.getElementById(`o${n}_ek_sp_row`)?.style.display !== 'none';
+    const ek_invest = txt(`o${n}_ek_invest`);
+    const ek_invest_vis = document.getElementById(`o${n}_ek_invest_row`)?.style.display !== 'none';
+    const ek_bauzinsen = txt(`o${n}_ek_bauzinsen`);
+    const ek_bauzinsen_vis = document.getElementById(`o${n}_ek_bauzinsen_row`)?.style.display !== 'none';
     const ek_total = txt(`o${n}_ek_total`);
     const kp_qm    = txt(`o${n}_kp_qm`);
     // Finanzierung
@@ -6246,6 +6250,9 @@ function generatePrintView() {
     const kfw_tilg_info = txt(`o${n}_kfw_tilg_info`);
     const kfw_zuschuss = val(`o${n}_kfw_zuschuss`);
     const sondertilg_exp = readSondertilg(n).map(x => ({ jahr: x.jahr, betrag: x.betrag }));
+    const zahlart_exp = val(`o${n}_zahlart`) || 'fertig';
+    const mietbeginn_exp = val(`o${n}_mietbeginn`);
+    const mabvRaten_exp = readMabv(n).raten;
     const afa_typ_exp = document.getElementById(`o${n}_afa_typ`)?.value || '10';
     const dk = afa_typ_exp === 'denkmal' ? {
       grund: val(`o${n}_dk_grund_pct`), altbau: val(`o${n}_dk_altbau_pct`), denkmal: val(`o${n}_dk_denkmal_pct`),
@@ -6303,8 +6310,9 @@ function generatePrintView() {
 
     return { n, bezeichnung, adresse, baujahr, mea, zimmer, etage, wohnungsnr, notizen,
              flaeche, kaufpreis, gebanteil, bl, wert_pa, nk_makler, nk_notar, nk_grest,
-             nk_total, ek_kp, ek_nk, ek_sp, ek_sp_vis, ek_total, kp_qm, fingrad, bankzins, tilg, bank_zb,
+             nk_total, ek_kp, ek_nk, ek_sp, ek_sp_vis, ek_invest, ek_invest_vis, ek_bauzinsen, ek_bauzinsen_vis, ek_total, kp_qm, fingrad, bankzins, tilg, bank_zb,
              bTF, kfw_betrag, kfw_zins, kfw_laufzeit, kfw_tf, kfw_tilg_info, kfw_zuschuss, sondertilg_exp, dk, nkFin,
+             zahlart_exp, mietbeginn_exp, mabvRaten_exp,
              miete_qm, leerstand, hg_u, hg_n, instand, gesamtmiete, stellplaetze,
              miete_stieg, hg_stieg, wert_pa2, rhythmus, afaLabel, bestand_pct, foto,
              marktwert, marktwertDeltaVal, bankdarlehen_export };
@@ -6413,6 +6421,8 @@ function generatePrintView() {
         ${sec('Eigenkapital')}
         ${row2('Eigenanteil Kaufpreis', o.ek_kp)}
         ${row2('Kaufnebenkosten' + (o.nkFin ? ' (finanziert)' : ''), o.nkFin ? '–' : o.ek_nk)}
+        ${o.ek_invest_vis ? row2('Weitere Investitionskosten', o.ek_invest) : ''}
+        ${o.ek_bauzinsen_vis ? row2('Bauzeitzinsen (MaBV)', o.ek_bauzinsen) : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1.5px solid #BBF7D0;margin-top:4px;">
           <span style="font-size:9.5px;font-weight:800;color:#297850;">Benötigtes Eigenkapital</span>
           <span style="font-size:11px;font-weight:800;color:#297850;">${o.ek_total}</span>
@@ -6463,6 +6473,14 @@ function generatePrintView() {
         ${(o.sondertilg_exp || []).map(st => row2('Sondertilgung Jahr ' + st.jahr, fmtV(st.betrag))).join('')}
       </div>
     </div>
+    ${o.zahlart_exp === 'mabv' ? `
+    <!-- Zahlungsplan (MaBV) -->
+    <div style="padding:12px 14px;border-top:1px solid #E2E8F0;">
+      ${sec('Zahlungsplan (Nach Baufortschritt / MaBV)','#B45309')}
+      ${(o.mabvRaten_exp || []).map((r,i) => row2('Rate ' + (i+1) + ' · Monat ' + r.monat, fmtV(r.betrag))).join('')}
+      ${row2('Mietbeginn / Fertigstellung', o.mietbeginn_exp + ' Mon.', true)}
+      ${o.ek_bauzinsen_vis ? row2('Bauzeitzinsen (Zinsen bis Mietbeginn, Werbungskosten Jahr 1)', o.ek_bauzinsen, true) : ''}
+    </div>` : ''}
   </div>`).join('');
 
   gi('print-view').innerHTML = `

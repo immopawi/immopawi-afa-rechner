@@ -534,22 +534,22 @@ input[type=number]:focus::-webkit-outer-spin-button { opacity:1; }
       <div id="g_bl_wohnsitz_row" class="field" style="display:none;margin-bottom:10px;">
         <label>Bundesland (Wohnsitz) <span style="font-size:10px;color:#9CA3AF;font-weight:400;">→ Kirchensteuersatz</span></label>
         <select id="g_wohnsitz_bl">
-          <option value="8">Baden-Württemberg (8 %)</option>
-          <option value="8">Bayern (8 %)</option>
-          <option value="9">Berlin (9 %)</option>
-          <option value="9">Brandenburg (9 %)</option>
-          <option value="9">Bremen (9 %)</option>
-          <option value="9">Hamburg (9 %)</option>
-          <option value="9">Hessen (9 %)</option>
-          <option value="9" selected>Mecklenburg-Vorpommern (9 %)</option>
-          <option value="9">Niedersachsen (9 %)</option>
-          <option value="9">NRW (9 %)</option>
-          <option value="9">Rheinland-Pfalz (9 %)</option>
-          <option value="9">Saarland (9 %)</option>
-          <option value="9">Sachsen (9 %)</option>
-          <option value="9">Sachsen-Anhalt (9 %)</option>
-          <option value="9">Schleswig-Holstein (9 %)</option>
-          <option value="9">Thüringen (9 %)</option>
+          <option value="Baden-Württemberg">Baden-Württemberg (8 %)</option>
+          <option value="Bayern">Bayern (8 %)</option>
+          <option value="Berlin">Berlin (9 %)</option>
+          <option value="Brandenburg">Brandenburg (9 %)</option>
+          <option value="Bremen">Bremen (9 %)</option>
+          <option value="Hamburg">Hamburg (9 %)</option>
+          <option value="Hessen">Hessen (9 %)</option>
+          <option value="Mecklenburg-Vorpommern" selected>Mecklenburg-Vorpommern (9 %)</option>
+          <option value="Niedersachsen">Niedersachsen (9 %)</option>
+          <option value="NRW">NRW (9 %)</option>
+          <option value="Rheinland-Pfalz">Rheinland-Pfalz (9 %)</option>
+          <option value="Saarland">Saarland (9 %)</option>
+          <option value="Sachsen">Sachsen (9 %)</option>
+          <option value="Sachsen-Anhalt">Sachsen-Anhalt (9 %)</option>
+          <option value="Schleswig-Holstein">Schleswig-Holstein (9 %)</option>
+          <option value="Thüringen">Thüringen (9 %)</option>
         </select>
       </div>
       <!-- Kinder -->
@@ -773,6 +773,7 @@ input[type=number]:focus::-webkit-outer-spin-button { opacity:1; }
           <div class="info-row"><span class="info-key">− AfA gesamt</span><span class="info-val blue" id="hw_afa">–</span></div>
           <div class="info-row"><span class="info-key">− Schuldzinsen (Bank + KfW)</span><span class="info-val red" id="hw_zins">–</span></div>
           <div class="info-row"><span class="info-key">− Hausgeld nicht umlagefähig p.a.</span><span class="info-val red" id="hw_hg">–</span></div>
+          <div class="info-row" id="hw_bauzinsen_row" style="display:none;"><span class="info-key" style="color:#B45309;cursor:help;" data-tip="Zinsen der Bauphase (vor Mietbeginn) — als vorweggenommene Werbungskosten im Jahr des Abflusses abzugsfähig.">− Bauzeitzinsen (MaBV)</span><span class="info-val red" id="hw_bauzinsen">–</span></div>
           <div class="info-row" style="border-top:1px solid #E2E8F0;padding-top:6px;margin-top:2px;">
             <span class="info-key" style="font-weight:700;">= V+V-Ergebnis (steuerlich)</span>
             <span class="info-val" style="font-size:14px;" id="hw_vv">–</span>
@@ -1070,7 +1071,7 @@ input[type=number]:focus::-webkit-outer-spin-button { opacity:1; }
               <th class="left" style="padding-left:16px;cursor:help;" data-tip="Abschreibungsbetrag nach §7 EStG.&#10;DEG = degressiv 5 % vom Restwert&#10;LINEAR = linear 2–3 % vom Gebäudewert&#10;+SONDER = §7b Sonder-AfA (weitere 5 %)&#10;&#10;Die AfA mindert dein zu versteuerndes Einkommen — je höher, desto mehr Steuern sparst du.">AfA <span style="font-weight:400;font-size:9px;opacity:0.7;">ℹ</span></th>
               <th style="cursor:help;" data-tip="Zinszahlungen an Bank und KfW im jeweiligen Jahr.&#10;Schuldzinsen sind als Werbungskosten voll abzugsfähig und senken das V+V-Ergebnis zusätzlich zur AfA.">Schuldzinsen</th>
               <th class="jp-tilg-col" style="cursor:help;" data-tip="Tilgungsanteil der Annuität (Bank + KfW) im jeweiligen Jahr.&#10;Fließt nicht in die Steuerrechnung ein — baut aber Vermögen auf (Restschuld sinkt).">Tilgung</th>
-              <th style="cursor:help;" data-tip="Steuerliches Ergebnis aus Vermietung &amp; Verpachtung:&#10;Miete − AfA − Schuldzinsen − Hausgeld (n. umlagef.)&#10;&#10;Hinweis: Die Instandhaltungsrücklage fließt NICHT ein — sie ist erst bei tatsächlicher Ausgabe steuerlich abzugsfähig und wirkt sich deshalb nur auf den Cashflow aus, nicht auf die Steuerberechnung.&#10;&#10;Negativ = steuerlicher Verlust → gut für dich!&#10;Das Finanzamt erkennt diesen Verlust an und erstattet dir Steuern.&#10;Positiv = steuerpflichtiger Überschuss (erst nach AfA-Auslauf realistisch).">V+V-Ergebnis <span style="font-weight:400;font-size:9px;color:#297850;">↓ = gut</span></th>
+              <th style="cursor:help;" data-tip="Steuerliches Ergebnis aus Vermietung &amp; Verpachtung:&#10;Miete − AfA − Schuldzinsen − Hausgeld (n. umlagef.)&#10;In Jahr 1 zusätzlich: − Bauzeitzinsen (MaBV, als vorweggenommene Werbungskosten).&#10;&#10;Hinweis: Die Instandhaltungsrücklage fließt NICHT ein — sie ist erst bei tatsächlicher Ausgabe steuerlich abzugsfähig und wirkt sich deshalb nur auf den Cashflow aus, nicht auf die Steuerberechnung.&#10;&#10;Negativ = steuerlicher Verlust → gut für dich!&#10;Das Finanzamt erkennt diesen Verlust an und erstattet dir Steuern.&#10;Positiv = steuerpflichtiger Überschuss (erst nach AfA-Auslauf realistisch).">V+V-Ergebnis <span style="font-weight:400;font-size:9px;color:#297850;">↓ = gut</span></th>
               <th style="cursor:help;" data-tip="Steuerliche Erstattung (wenn V+V negativ) oder Nachzahlung (wenn V+V positiv).&#10;Berechnung: V+V-Ergebnis × persönlicher Grenzsteuersatz inkl. Soli.&#10;&#10;Positiver Wert = du bekommst Geld vom Finanzamt zurück.">Steuer­ersparnis</th>
               <th style="cursor:help;" data-tip="Monatlicher Netto-Cashflow nach allen Kosten und Steuern:&#10;(Miete − Annuität − Hausgeld − Instandhaltung + Steuererstattung) ÷ 12&#10;&#10;Grün = du nimmst mehr ein als du ausgibst.&#10;Grau = du zahlst monatlich zu — der Steuer- und Wertsteigerungseffekt kompensiert das.">CF mtl. <span style="font-weight:400;font-size:9px;opacity:0.7;">ℹ</span></th>
               <th style="cursor:help;" data-tip="Kumulierter Cashflow seit Investitionsbeginn (Summe aller CF mtl. × 12).&#10;&#10;Zeigt, wann du insgesamt „im Plus" bist — also mehr eingenommen als ausgegeben hast.">Kum. CF</th>
@@ -1162,10 +1163,18 @@ const GREST_SAETZE = {
   'Brandenburg':6.5,'NRW':6.5,'Saarland':6.5,'Schleswig-Holstein':6.5,'Thüringen':6.5
 };
 
+// Kirchensteuersätze je Bundesland (Wohnsitz) — 8 % Bayern/BW, sonst 9 %
+const KIST_SAETZE = {
+  'Baden-Württemberg':8,'Bayern':8,
+  'Berlin':9,'Brandenburg':9,'Bremen':9,'Hamburg':9,'Hessen':9,
+  'Mecklenburg-Vorpommern':9,'Niedersachsen':9,'NRW':9,'Rheinland-Pfalz':9,
+  'Saarland':9,'Sachsen':9,'Sachsen-Anhalt':9,'Schleswig-Holstein':9,'Thüringen':9
+};
+
 // ─── OBJEKT TEMPLATE ─────────────────────────────────────────────────────────
 function objektHTML(n) {
   const blOptions = Object.entries(GREST_SAETZE).sort((a,b)=>a[0].localeCompare(b[0])).map(([name,rate]) =>
-    `<option value="${rate}" ${name==='Mecklenburg-Vorpommern'?'selected':''}>${name} (${rate.toFixed(1).replace('.',',')} %)</option>`
+    `<option value="${name}" ${name==='Mecklenburg-Vorpommern'?'selected':''}>${name} (${rate.toFixed(1).replace('.',',')} %)</option>`
   ).join('');
 
   return `
@@ -1430,6 +1439,7 @@ function objektHTML(n) {
           <div class="ek-row"><span class="ek-key">Kaufnebenkosten</span><span class="ek-val" id="o${n}_ek_nk">–</span></div>
           <div class="ek-row" id="o${n}_ek_sp_row" style="display:none;"><span class="ek-key" style="color:#1D4ED8;">+ Stellplatz (im Bankdarlehen)</span><span class="ek-val" style="color:#1D4ED8;" id="o${n}_ek_sp">–</span></div>
           <div class="ek-row" id="o${n}_ek_invest_row" style="display:none;"><span class="ek-key">Weitere Investitionskosten</span><span class="ek-val" id="o${n}_ek_invest">–</span></div>
+          <div class="ek-row" id="o${n}_ek_bauzinsen_row" style="display:none;"><span class="ek-key" style="color:#B45309;cursor:help;" data-tip="Zinsen auf die bereits abgerufenen MaBV-Raten während der Bauphase (vor Mietbeginn) — dafür gibt es noch keine Miete, mit der man gegenrechnen könnte. Muss zusätzlich aus Eigenmitteln getragen werden.">+ Bauzeitzinsen (MaBV)</span><span class="ek-val" style="color:#B45309;" id="o${n}_ek_bauzinsen">–</span></div>
           <div class="ek-total">
             <span class="ek-total-label">Benötigtes Eigenkapital</span>
             <span class="ek-total-val" id="o${n}_ek_total">–</span>
@@ -1456,8 +1466,9 @@ function objektHTML(n) {
         <input type="hidden" id="o${n}_zahlart" value="fertig">
         <div id="o${n}_mabv_wrap" style="display:none;">
           <div class="field">
-            <label>Mietbeginn / Fertigstellung <span data-tip="Monate nach Beurkundung (Tag 0), ab denen die Wohnung vermietet ist.&#10;Bis dahin laufen Zinsen auf die bereits abgerufenen Raten — ohne Mieteinnahmen." style="cursor:help;font-size:10px;color:#9CA3AF;">ℹ</span></label>
-            <div class="suffix" data-unit="Mon."><input id="o${n}_mietbeginn" type="number" min="1" max="60" value="18" oninput="computeDebounced()"></div>
+            <label>Mietbeginn / Fertigstellung <span data-tip="Der Monat, ab dem die Wohnung vermietet ist — hier beginnt Jahr 1 der Kalkulation (erste Mieteinnahmen, AfA startet).&#10;Bis dahin laufen nur Zinsen auf die bereits abgerufenen Raten (Bauzeitzinsen), keine Mieteinnahmen.&#10;&#10;Wird automatisch auf den Monat der letzten Rate gesetzt und folgt Änderungen an den Raten — bis du den Wert hier selbst überschreibst.&#10;&#10;Kann auch VOR der letzten Rate liegen, z.B. wenn die Schlussrate ein Sicherheitseinbehalt ist, der erst nach der mängelfreien Frist nach Einzug gezahlt wird." style="cursor:help;font-size:10px;color:#9CA3AF;">ℹ</span></label>
+            <div class="suffix" data-unit="Mon."><input id="o${n}_mietbeginn" type="number" min="1" max="60" value="18" oninput="mietbeginnManual[${n}]=true;computeDebounced();mabvUpdateMietbeginnHint(${n})"></div>
+            <div id="o${n}_mietbeginn_hint" style="font-size:9.5px;color:#9CA3AF;margin-top:4px;line-height:1.4;"></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 6px;">
             <span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Raten (ab Beurkundung = Monat 0)</span>
@@ -1921,6 +1932,7 @@ let spCounters = {};
 
 // ─── ZAHLUNGSPLAN (MaBV) ─────────────────────────────────────────────────────
 let mabvCounters = {};
+let mietbeginnManual = {}; // true = Nutzer hat Mietbeginn selbst überschrieben → kein Auto-Sync mit den Raten mehr
 
 function setZahlart(n, art, btn) {
   document.getElementById(`o${n}_zahlart`).value = art;
@@ -1947,7 +1959,7 @@ function addMabvRate(n, monat = 0, betrag = 0) {
     <span style="font-size:10px;color:#6B7280;white-space:nowrap;min-width:44px;">Rate ${list.children.length + 1}</span>
     <div style="display:flex;flex-direction:column;gap:1px;width:74px;">
       <span style="font-size:9px;color:#9CA3AF;">Monat</span>
-      <div class="suffix" data-unit="M."><input id="o${n}_mabv_${sid}_monat" type="number" min="0" max="60" value="${monat}" style="width:100%;padding:4px 26px 4px 7px;border:1px solid #E2E8F0;border-radius:5px;font-size:11px;background:#fff;outline:none;font-family:inherit;" oninput="computeDebounced()"></div>
+      <div class="suffix" data-unit="M."><input id="o${n}_mabv_${sid}_monat" type="number" min="0" max="60" value="${monat}" style="width:100%;padding:4px 26px 4px 7px;border:1px solid #E2E8F0;border-radius:5px;font-size:11px;background:#fff;outline:none;font-family:inherit;" oninput="computeDebounced();mabvSyncMietbeginn(${n})"></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:1px;flex:1;">
       <span style="font-size:9px;color:#9CA3AF;">Betrag</span>
@@ -1955,6 +1967,7 @@ function addMabvRate(n, monat = 0, betrag = 0) {
     </div>
     <button type="button" onclick="removeMabvRate(${n},${sid})" style="background:none;border:none;font-size:14px;color:#CBD5E1;cursor:pointer;padding:0 2px;line-height:1;" title="Entfernen">×</button>`;
   list.appendChild(row);
+  mabvSyncMietbeginn(n);
 }
 
 function removeMabvRate(n, sid) {
@@ -1962,7 +1975,52 @@ function removeMabvRate(n, sid) {
   // Nummerierung auffrischen
   const list = document.getElementById(`o${n}_mabv_list`);
   [...list.children].forEach((row, i) => { const lbl = row.querySelector('span'); if (lbl) lbl.textContent = `Rate ${i + 1}`; });
+  mabvSyncMietbeginn(n);
   compute();
+}
+
+// Höchster Ratenmonat — Referenzpunkt für den Mietbeginn-Vorschlag
+function mabvGetLastRateMonth(n) {
+  const list = document.getElementById(`o${n}_mabv_list`);
+  if (!list) return 0;
+  let max = 0;
+  list.querySelectorAll('input[id$="_monat"]').forEach(inp => { max = Math.max(max, parseInt(inp.value) || 0); });
+  return max;
+}
+
+// Hinweistext unter dem Mietbeginn-Feld: zeigt die letzte Rate zum Vergleich,
+// warnt (ohne zu blockieren) wenn Mietbeginn vor der letzten Rate liegt.
+function mabvUpdateMietbeginnHint(n) {
+  const hintEl = document.getElementById(`o${n}_mietbeginn_hint`);
+  const mbEl = document.getElementById(`o${n}_mietbeginn`);
+  if (!hintEl || !mbEl) return;
+  const lastRate = mabvGetLastRateMonth(n);
+  const mb = parseInt(mbEl.value) || 0;
+  const puffer = mb - lastRate; // >0 = Mietbeginn nach der letzten Rate, <0 = davor
+  if (lastRate <= 0) {
+    hintEl.textContent = '';
+  } else if (puffer < 0) {
+    hintEl.innerHTML = `⚠ Mietbeginn liegt ${Math.abs(puffer)} Monat${Math.abs(puffer)===1?'':'e'} vor der letzten Rate (Monat ${lastRate}). Das ist nur üblich, wenn die Schlussrate ein Sicherheitseinbehalt ist (fällig erst nach der mängelfreien Frist nach Einzug).`;
+    hintEl.style.color = '#B45309';
+  } else if (puffer === 0) {
+    hintEl.textContent = `Letzte Rate: Monat ${lastRate} — kein Puffer, Mietbeginn direkt mit der letzten Rate.`;
+    hintEl.style.color = '#9CA3AF';
+  } else {
+    hintEl.textContent = `Letzte Rate: Monat ${lastRate} → ${puffer} Monat${puffer===1?'':'e'} Puffer bis Mietbeginn (z. B. für Übergabe & Vermietungsanlauf).`;
+    hintEl.style.color = '#9CA3AF';
+  }
+}
+
+// Mietbeginn folgt automatisch der letzten Rate — bis der Nutzer das Feld selbst überschreibt
+// (dann bleibt der manuell eingegebene Wert erhalten, siehe mietbeginnManual).
+function mabvSyncMietbeginn(n) {
+  const mbEl = document.getElementById(`o${n}_mietbeginn`);
+  if (!mbEl) return;
+  if (!mietbeginnManual[n]) {
+    const lastRate = mabvGetLastRateMonth(n);
+    if (lastRate > 0) mbEl.value = lastRate;
+  }
+  mabvUpdateMietbeginnHint(n);
 }
 
 // Typischer 7-Raten-Plan nach §3 Abs. 2 MaBV (prozentual vom Kaufpreis inkl. Stellplätze)
@@ -1970,6 +2028,7 @@ function mabvPreset(n) {
   const list = document.getElementById(`o${n}_mabv_list`);
   list.innerHTML = '';
   mabvCounters[n] = 0;
+  mietbeginnManual[n] = false; // Preset setzt einen frischen, realistischen Standardwert
   const o = readObjekt(n);
   const basis = o.kaufpreis + o.stellplatz_kp + o.stellplatz_kp_tg;
   const raten = [
@@ -2598,7 +2657,7 @@ function readObjekt(n) {
   const kaufpreis = v(`o${n}_kaufpreis`);
   const flaeche   = v(`o${n}_flaeche`);
   const gebanteil = v(`o${n}_gebanteil`);
-  const bl_satz   = parseFloat(g(`o${n}_bl`)?.value) || 5.5;
+  const bl_satz   = GREST_SAETZE[g(`o${n}_bl`)?.value] ?? 5.5;
   const makler    = v(`o${n}_makler`);
   const notar     = v(`o${n}_notar`);
   const miete_qm  = v(`o${n}_miete_qm`);
@@ -2720,9 +2779,11 @@ function simulateObjekt(o, gzs, bankzins, hd, nk_finanziert) {
   const nk_total  = nk_makler + nk_notar + nk_grest + nk_gb + nk_eb;
 
   const eigenkap_kp = kaufpreis * (1 - fingrad/100);
-  const ek = (nk_finanziert ? eigenkap_kp : eigenkap_kp + nk_total) + investTotal;
   const fremdkap = kaufpreis * fingrad/100 + (nk_finanziert ? nk_total : 0) + sp_kp_total + moebel_kp;
   const bankdarlehen = Math.max(0, fremdkap - kfw_betrag);
+  // Bauzeitzinsen (MaBV): Vorlaufkosten der Bauphase, muss zusätzlich aus EK getragen werden
+  const bauzinsen = calcBauzinsen(o, { bankdarlehen, kfw_betrag });
+  const ek = (nk_finanziert ? eigenkap_kp : eigenkap_kp + nk_total) + investTotal + bauzinsen;
   const gik = kaufpreis + nk_total + investTotal + sp_kp_total + moebel_kp;
   // TG-Stellplatz ist Gebäudeteil → AfA-Basis enthält dessen Kaufpreis
   let gebaeudewert = (kaufpreis + stellplatz_kp_tg) * gebanteil / 100;
@@ -2848,7 +2909,9 @@ function simulateObjekt(o, gzs, bankzins, hd, nk_finanziert) {
     }
     const afaTotal = afaDeg + afaSonder;
     // Instandhaltungsrücklage ist NICHT steuerlich abzugsfähig (nur bei tatsächlicher Ausgabe)
-    const vvErgebnis = mieteJahr - afaTotal - schuldzinsen - hgN_cur*12;
+    // Bauzeitzinsen sind vorweggenommene Werbungskosten — abzugsfähig im Jahr des Abflusses (hier: Jahr 1)
+    const bauzinsenAbzug = yr === 1 ? bauzinsen : 0;
+    const vvErgebnis = mieteJahr - afaTotal - schuldzinsen - hgN_cur*12 - bauzinsenAbzug;
     const gzsYr = Array.isArray(gzs) ? (gzs[yr-1] ?? gzs[gzs.length-1]) : gzs;
     const steuereffekt = -vvErgebnis * gzsYr;
     const cfVorSteuer  = mieteJahr - annuBankAnnual - annuKfwAnnual - hgN_cur*12 - instandhalJahr - sonderTilgJahr;
@@ -2862,7 +2925,7 @@ function simulateObjekt(o, gzs, bankzins, hd, nk_finanziert) {
       bankRestschuld, kfwRestschuld });
   }
 
-  return { years, nk_makler, nk_notar, nk_grest, nk_gb, nk_eb, nk_total, ek, eigenkap_kp, gik,
+  return { years, nk_makler, nk_notar, nk_grest, nk_gb, nk_eb, nk_total, ek, eigenkap_kp, gik, bauzinsen,
            dkAltbauBasis, dkDenkmalBasis, moebel_kp,
            gebaeudewert, bankdarlehen, kfw_betrag, miete_qm, flaeche, stellplatz,
            stellplatz_kp, stellplatz_kp_tg, kaufpreis, hg_u, hg_n, switchJahr };
@@ -3091,6 +3154,7 @@ function renderRechenweg() {
   const hwAfa   = yv('afaTotal');
   const hwZins  = yv('schuldzinsen');
   const hwHg    = lastSimResults.reduce((s,r)=>s+(r.sim.years[idx]?.hgN_cur||0)*12,0);
+  const hwBz    = rwJahr === 1 ? lastSimResults.reduce((s,r)=>s+(r.sim.bauzinsen||0),0) : 0;
   const hwVv    = yv('vvErgebnis');
   const hwSt    = yv('steuereffekt');
   const setHw = (id, v, sgn) => { const el=document.getElementById(id); if (el) el.textContent = (sgn ? (v>=0?'+':'−') : (v<0?'−':'')) + fmt(Math.abs(v)); };
@@ -3098,6 +3162,8 @@ function renderRechenweg() {
   setHw('hw_afa', hwAfa, false);
   setHw('hw_zins', hwZins, false);
   setHw('hw_hg', hwHg, false);
+  const hwBzRow = document.getElementById('hw_bauzinsen_row');
+  if (hwBzRow) { hwBzRow.style.display = hwBz>0.5?'':'none'; setHw('hw_bauzinsen', hwBz, false); }
   setHw('hw_vv', hwVv, true);
   const hwVvEl = document.getElementById('hw_vv');
   if (hwVvEl) hwVvEl.style.color = hwVv < 0 ? '#297850' : '#B45309';
@@ -3161,7 +3227,7 @@ function _computeInner() {
   const nk_fin      = false; // per-object now (g_nk_finanziert_N inside each Objekt card)
   const etf_pa      = num(document.getElementById('g_etf_pa').value);
   const hd          = haltedauer;
-  const kirche_satz = parseFloat(document.getElementById('g_wohnsitz_bl').value) || 9;
+  const kirche_satz = KIST_SAETZE[document.getElementById('g_wohnsitz_bl').value] ?? 9;
 
   const tax = calcGrenzsteuersatz(brutto, verheiratet, kinder);
   const gzs = tax.gzs;
@@ -3236,7 +3302,7 @@ function _computeInner() {
   const wertGain   = simResults.reduce((s,r) => s + wertBasis(r) * (Math.pow(1+r.o.wert_pa/100,hd)-1), 0);
   // Bauzeitzinsen (MaBV): Vorlaufkosten der Bauphase, mindern den Total Return
   bauzinsenByObj = {};
-  simResults.forEach(r => { bauzinsenByObj[r.n] = calcBauzinsen(r.o, r.sim); });
+  simResults.forEach(r => { bauzinsenByObj[r.n] = r.sim.bauzinsen; });
   bauzinsenGesamt = Object.values(bauzinsenByObj).reduce((s,v)=>s+v,0);
   const totalReturn= totalSteuer+totalTilg+totalCf+wertGain+marktwertDelta-bauzinsenGesamt;
   const ekRend     = totalEk>0 ? (Math.pow(1+totalReturn/totalEk,1/hd)-1)*100 : 0;
@@ -3305,6 +3371,8 @@ function _computeInner() {
     const investRow = document.getElementById(`o${n}_ek_invest_row`);
     const investVal = readObjekt(n).investTotal;
     if (investRow) { investRow.style.display = investVal>0?'':'none'; document.getElementById(`o${n}_ek_invest`).textContent = fmt(investVal); }
+    const bzRow = document.getElementById(`o${n}_ek_bauzinsen_row`);
+    if (bzRow) { bzRow.style.display = sim.bauzinsen>0.5?'':'none'; document.getElementById(`o${n}_ek_bauzinsen`).textContent = fmt(sim.bauzinsen); }
     document.getElementById(`o${n}_ek_total`).textContent = fmt(sim.ek);
 
     // Finanzierungsstruktur-Donut
@@ -4771,7 +4839,10 @@ function applyState(state) {
     const list = document.getElementById(`o${n}_mabv_list`);
     if (list) list.innerHTML = '';
     mabvCounters[n] = 0;
+    // Gespeicherten Mietbeginn respektieren — nicht durch den Raten-Auto-Sync überschreiben lassen
+    mietbeginnManual[n] = true;
     raten.forEach(r => addMabvRate(parseInt(n), r.monat, r.betrag));
+    mabvUpdateMietbeginnHint(parseInt(n));
     // Zahlart-Buttons optisch nachziehen
     const art = document.getElementById(`o${n}_zahlart`)?.value || 'fertig';
     if (art === 'mabv') {
@@ -5806,7 +5877,10 @@ function applyUnitToObjekt(unit, n) {
   if (mList) {
     mList.innerHTML = '';
     mabvCounters[n] = 0;
+    // Gespeicherten Mietbeginn respektieren — nicht durch den Raten-Auto-Sync überschreiben lassen
+    mietbeginnManual[n] = true;
     (d.mabv || []).forEach(r => addMabvRate(n, r.monat, r.betrag));
+    mabvUpdateMietbeginnHint(n);
   }
   // Sondertilgungen neu aufbauen
   const stList = document.getElementById(`o${n}_sondertilg_list`);

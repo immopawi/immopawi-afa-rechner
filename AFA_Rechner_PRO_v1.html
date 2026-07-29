@@ -741,16 +741,19 @@ input[type=number]:focus::-webkit-outer-spin-button { opacity:1; }
           </div>
           <div style="display:flex;align-items:center;gap:14px;">
             <div class="legend">
-              <div class="legend-item"><div class="legend-dot" style="background:#297850"></div>Einnahme</div>
               <div class="legend-item"><div class="legend-dot" style="background:#F87171"></div>Ausgabe</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#16A34A"></div>Tilgung Bank</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#86EFAC"></div>Tilgung KfW</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FCA5A5"></div>Zinsen KfW</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>Zinsen Bank</div>
               <div class="legend-item"><div class="legend-dot" style="background:#475569"></div>Zwischensumme</div>
-              <div class="legend-item"><div class="legend-dot" style="background:#16A34A"></div>Ergebnis</div>
             </div>
             <select id="wf_jahr_select" onchange="wfSetJahr(this.value)" style="padding:4px 8px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:11px;font-weight:600;color:#297850;background:#fff;cursor:pointer;font-family:inherit;outline:none;">
               <option value="1">Jahr 1</option>
             </select>
           </div>
         </div>
+        <div class="graph-sub" style="margin-top:6px;font-size:10.5px;color:#94A3AF;">"Bankrate" fasst Zinsen &amp; Tilgung zu einem Balken zusammen — die vier Farben zeigen den Anteil je Darlehen. Sondertilgungen sind hier bewusst ausgeklammert, da sie aus Eigenkapital (nicht aus der Miet-Liquidität) beglichen werden.</div>
         <div class="chart-wrapper" style="height:280px;"><canvas id="waterfallChart"></canvas></div>
       </div>
 
@@ -3512,18 +3515,24 @@ function _computeInner() {
   // Wasserfall: monatliche Werte für jedes Haltejahr (Jahr wählbar)
   try {
     wfYearData = Array.from({length: hd}, (_, i) => {
-      let brutto = 0, rate = 0, hg = 0, bew = 0, steuer = 0;
+      // Sondertilgung fließt bewusst NICHT ein — sie wird aus externem Kapital (EK) beglichen,
+      // nicht aus der laufenden Miet-Liquidität, und soll diese Monatsbetrachtung nicht verzerren.
+      let brutto = 0, rate = 0, zinsBank = 0, zinsKfw = 0, tilgBank = 0, tilgKfw = 0, hg = 0, bew = 0, steuer = 0;
       simResults.forEach(r => {
         const y = r.sim.years[i]; if (!y) return;
         const o = r.o;
         const bruttoJ = o.leerstand < 100 ? y.mieteJahr / (1 - o.leerstand/100) : y.mieteJahr;
-        brutto += bruttoJ / 12;
-        bew    += (bruttoJ - y.mieteJahr) / 12 + y.instandhalJahr / 12;
-        rate   += (y.annuBankAnnual + y.annuKfwAnnual) / 12;
-        hg     += y.hgN_cur;
-        steuer += y.steuereffekt / 12;
+        brutto  += bruttoJ / 12;
+        bew     += (bruttoJ - y.mieteJahr) / 12 + y.instandhalJahr / 12;
+        rate    += (y.annuBankAnnual + y.annuKfwAnnual) / 12;
+        zinsBank+= y.bankZins / 12;
+        zinsKfw += y.kfwZinsJ / 12;
+        tilgBank+= y.bankTilgBetrag / 12;
+        tilgKfw += (y.kfwTilgBetrag + (y.kfwZuschuss || 0)) / 12;
+        hg      += y.hgN_cur;
+        steuer  += y.steuereffekt / 12;
       });
-      return { brutto, rate, hg, bew, steuer };
+      return { brutto, rate, zinsBank, zinsKfw, tilgBank, tilgKfw, hg, bew, steuer };
     });
     // Jahr-Auswahl auffüllen (nur bei Änderung der Haltedauer)
     const wfSel = document.getElementById('wf_jahr_select');
@@ -4000,37 +4009,65 @@ function renderWaterfall() {
   const d = wfYearData[idx];
   const lbl = document.getElementById('wf_jahr_label');
   if (lbl) lbl.textContent = `Jahr ${idx + 1}`;
-  updateWaterfallChart([
-    { label: 'Kaltmiete',            delta:  d.brutto,  section: 1 },
-    { label: 'Rate Bank + KfW',      delta: -d.rate,    section: 1 },
+  const bankrateGesamt = d.zinsBank + d.zinsKfw + d.tilgBank + d.tilgKfw;
+  const steps = [
+    { label: 'Kaltmiete', delta: d.brutto, section: 1 },
+    { label: 'Bankrate',  delta: -bankrateGesamt, section: 1, segments: [
+      { key: 'tilgBank', label: 'Tilgung Bank', value: d.tilgBank },
+      { key: 'tilgKfw',  label: 'Tilgung KfW',  value: d.tilgKfw  },
+      { key: 'zinsKfw',  label: 'Zinsen KfW',   value: d.zinsKfw  },
+      { key: 'zinsBank', label: 'Zinsen Bank',  value: d.zinsBank },
+    ]},
     { label: 'Hausgeld n. umlagef.', delta: -d.hg,      section: 1 },
     { label: 'Leerstand + Instandh.',delta: -d.bew,     section: 1 },
     { label: 'CF vor Steuer',        total: true,       section: 1 },
     { label: 'Steuervorteil AfA',    delta: d.steuer,   section: 2 },
     { label: 'CF nach Steuer',       total: true, final: true, section: 2 },
-  ]);
+  ];
+  updateWaterfallChart(steps);
 }
 
 function updateWaterfallChart(steps) {
   const el = document.getElementById('waterfallChart'); if (!el) return;
   if (chartWaterfall) { chartWaterfall.destroy(); chartWaterfall = null; }
-  // steps: [{label, delta?, total?, final?, section}] — total/final starten bei 0
+  // steps: [{label, delta?, total?, final?, section, segments?}] — total/final starten bei 0
+  // segments: optionale Unterteilung eines Balkens in mehrere Abschnitte (z.B. "Bankrate" → Tilgung/Zinsen
+  //           je Darlehen). Diese Abschnitte werden NICHT über Chart.js-Datensätze gestapelt (das verrechnet
+  //           sich mit absoluten Floating-Bar-Werten falsch), sondern direkt manuell auf den Canvas gezeichnet.
+  const SEG_COLOR = { tilgBank: '#16A34A', tilgKfw: '#86EFAC', zinsKfw: '#FCA5A5', zinsBank: '#EF4444' };
+
   let run = 0;
   const bars = [], colors = [], meta = [];
+
   steps.forEach(s => {
     if (s.total) {
       bars.push([0, run]);
       colors.push(s.final ? (run >= 0 ? '#16A34A' : '#DC2626') : '#475569');
       meta.push({ value: run, isTotal: true, final: !!s.final });
+    } else if (s.segments) {
+      const from = run;
+      run += s.delta; // s.delta ist die Summe aller Segmente (negativ = Abfluss)
+      bars.push([from, run]);
+      colors.push(null); // wird manuell im Plugin gezeichnet, nicht über Chart.js
+      // Absolute [from,to]-Bereiche je Segment vorab berechnen (Reihenfolge = Stapelreihenfolge von oben nach unten)
+      let cursor = from;
+      const segRanges = s.segments.map(seg => {
+        const segTo = cursor - seg.value;
+        const range = { ...seg, from: cursor, to: segTo };
+        cursor = segTo;
+        return range;
+      });
+      meta.push({ value: s.delta, isTotal: false, isSegmented: true, segRanges });
     } else {
       const from = run;
       run += s.delta;
       bars.push([from, run]);
-      colors.push(s.delta >= 0 ? '#297850' : '#F87171');
-      meta.push({ value: s.delta, isTotal: false });
+      colors.push(s.color || (s.delta >= 0 ? '#297850' : '#F87171'));
+      meta.push({ value: s.delta, isTotal: false, labelColor: s.labelColor });
     }
   });
   const sepIdx = steps.findIndex(s => s.section === 2); // erster Balken von Abschnitt 2
+  const mainData = bars.map((b, i) => meta[i].isSegmented ? null : b);
 
   const wfPlugin = {
     id: 'wfDecor',
@@ -4061,14 +4098,68 @@ function updateWaterfallChart(steps) {
         ctx.fillText('STEUEREFFEKT AFA', mid2, chartArea.top - 12);
       }
 
+      // Referenzbreite/-position je Kategorie: über den Hauptdatensatz, wo vorhanden;
+      // bei segmentierten Balken (dort ist der Hauptdatensatz leer) über die Kategorie-Skala selbst.
+      const mainMeta = chart.getDatasetMeta(0);
+      const refWidth = (mainMeta.data.find(d => d) || {}).width || 30;
+      const getBarRect = (i) => {
+        if (meta[i].isSegmented) {
+          const xc = x.getPixelForValue ? x.getPixelForValue(i) : x.getPixelForTick(i);
+          return { x: xc, width: refWidth };
+        }
+        return mainMeta.data[i];
+      };
+
+      // Segmentierte Balken manuell zeichnen (z.B. "Bankrate": Tilgung/Zinsen je Darlehen gestapelt)
+      meta.forEach((m, i) => {
+        if (!m.isSegmented) return;
+        const rect = getBarRect(i);
+        const rx = rect.x - rect.width / 2;
+        const n = m.segRanges.length;
+        m.segRanges.forEach((seg, si) => {
+          const yTop = y.getPixelForValue(Math.max(seg.from, seg.to));
+          const yBot = y.getPixelForValue(Math.min(seg.from, seg.to));
+          const h = Math.max(0, yBot - yTop);
+          ctx.fillStyle = SEG_COLOR[seg.key] || '#94A3B8';
+          const r = 5;
+          if (si === 0 && si === n - 1) {
+            // einziges Segment: rundum abgerundet
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(rx, yTop, rect.width, h, r) : ctx.rect(rx, yTop, rect.width, h);
+            ctx.fill();
+          } else if (si === 0) {
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(rx, yTop, rect.width, h, { tl: r, tr: r, bl: 0, br: 0 }) : ctx.rect(rx, yTop, rect.width, h);
+            ctx.fill();
+          } else if (si === n - 1) {
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(rx, yTop, rect.width, h, { tl: 0, tr: 0, bl: r, br: r }) : ctx.rect(rx, yTop, rect.width, h);
+            ctx.fill();
+          } else {
+            ctx.fillRect(rx, yTop, rect.width, h);
+          }
+          // dünne weiße Trennlinie zwischen den Segmenten
+          if (si > 0) {
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(rx, yTop); ctx.lineTo(rx + rect.width, yTop); ctx.stroke();
+          }
+          // Wert im Segment, falls genug Platz
+          if (h >= 13 && seg.value > 0.5) {
+            ctx.font = '600 8.5px -apple-system, sans-serif';
+            ctx.fillStyle = (seg.key === 'tilgKfw') ? '#166534' : '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${Math.round(seg.value).toLocaleString('de-DE')}€`, rect.x, yTop + h / 2 + 3);
+          }
+        });
+      });
+
       // Verbinderlinien zwischen den Balken
-      const dsMeta = chart.getDatasetMeta(0);
       ctx.strokeStyle = '#94A3B8';
       ctx.setLineDash([3, 3]);
       ctx.lineWidth = 1;
       for (let i = 0; i < bars.length - 1; i++) {
         if (meta[i + 1].isTotal) continue; // vor Zwischensummen kein Verbinder
-        const barA = dsMeta.data[i], barB = dsMeta.data[i + 1];
+        const barA = getBarRect(i), barB = getBarRect(i + 1);
         if (!barA || !barB) continue;
         const level = y.getPixelForValue(bars[i][1]);
         ctx.beginPath();
@@ -4078,10 +4169,12 @@ function updateWaterfallChart(steps) {
       }
       ctx.setLineDash([]);
 
-      // Wertelabels über/unter den Balken
+      // Wertelabels über/unter den Balken (bei segmentierten Balken: Gesamtsumme)
       ctx.textAlign = 'center';
-      dsMeta.data.forEach((bar, i) => {
+      bars.forEach((_, i) => {
         const m = meta[i];
+        const rect = getBarRect(i);
+        if (!rect) return;
         const vTxt = (m.isTotal ? (m.value >= 0 ? '' : '−') : (m.value >= 0 ? '+' : '−'))
           + Math.abs(Math.round(m.value)).toLocaleString('de-DE') + ' €';
         const topVal = Math.max(bars[i][0], bars[i][1]);
@@ -4089,8 +4182,8 @@ function updateWaterfallChart(steps) {
         ctx.font = (m.isTotal ? '800 11px' : '600 10px') + ' -apple-system, sans-serif';
         ctx.fillStyle = m.final ? (m.value >= 0 ? '#16A34A' : '#DC2626')
           : m.isTotal ? '#334155'
-          : (m.value >= 0 ? '#297850' : '#DC2626');
-        ctx.fillText(vTxt, bar.x, Math.max(yPos, chartArea.top + 10));
+          : (m.labelColor || (m.value >= 0 ? '#297850' : '#DC2626'));
+        ctx.fillText(vTxt, rect.x, Math.max(yPos, chartArea.top + 10));
       });
       ctx.restore();
     }
@@ -4100,7 +4193,7 @@ function updateWaterfallChart(steps) {
     type: 'bar',
     data: {
       labels: steps.map(s => s.label),
-      datasets: [{ data: bars, backgroundColor: colors, borderRadius: 5, barPercentage: 0.65 }]
+      datasets: [{ data: mainData, backgroundColor: colors, borderRadius: 5, barPercentage: 0.65 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -4108,6 +4201,7 @@ function updateWaterfallChart(steps) {
       plugins: {
         legend: { display: false },
         tooltip: {
+          filter: ctx => !meta[ctx.dataIndex].isSegmented,
           callbacks: {
             label: ctx => {
               const m = meta[ctx.dataIndex];

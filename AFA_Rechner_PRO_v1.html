@@ -6473,14 +6473,28 @@ function generatePrintView() {
         ${(o.sondertilg_exp || []).map(st => row2('Sondertilgung Jahr ' + st.jahr, fmtV(st.betrag))).join('')}
       </div>
     </div>
-    ${o.zahlart_exp === 'mabv' ? `
+    ${o.zahlart_exp === 'mabv' ? (() => {
+      const raten = o.mabvRaten_exp || [];
+      const summe = raten.reduce((s,r)=>s+(r.betrag||0),0);
+      const rateRow = (k,v) =>
+        `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #F1F5F9;">
+          <span style="color:#6B7280;font-size:8.5px;">${k}</span>
+          <span style="color:#111827;font-size:8.5px;font-weight:500;">${v}</span></div>`;
+      const half = Math.ceil(raten.length/2);
+      const col = (list, offset) => list.map((r,i) => rateRow('Rate ' + (offset+i+1) + ' · Mon. ' + r.monat, fmtV(r.betrag))).join('');
+      return `
     <!-- Zahlungsplan (MaBV) -->
-    <div style="padding:12px 14px;border-top:1px solid #E2E8F0;">
-      ${sec('Zahlungsplan (Nach Baufortschritt / MaBV)','#B45309')}
-      ${(o.mabvRaten_exp || []).map((r,i) => row2('Rate ' + (i+1) + ' · Monat ' + r.monat, fmtV(r.betrag))).join('')}
-      ${row2('Mietbeginn / Fertigstellung', o.mietbeginn_exp + ' Mon.', true)}
-      ${o.ek_bauzinsen_vis ? row2('Bauzeitzinsen (Zinsen bis Mietbeginn, Werbungskosten Jahr 1)', o.ek_bauzinsen, true) : ''}
-    </div>` : ''}
+    <div style="padding:10px 14px;border-top:1px solid #E2E8F0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:10px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;color:#B45309;display:flex;align-items:center;gap:6px;">
+          <div style="width:3px;height:12px;background:#B45309;border-radius:2px;"></div>Zahlungsplan (MaBV) — ${raten.length} Raten · ${fmtV(summe)}</span>
+        <span style="font-size:8.5px;color:#6B7280;">Mietbeginn: Monat ${o.mietbeginn_exp}${o.ek_bauzinsen_vis ? ' · Bauzeitzinsen: <strong style="color:#B45309;">' + o.ek_bauzinsen + '</strong>' : ''}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
+        <div>${col(raten.slice(0,half), 0)}</div>
+        <div>${col(raten.slice(half), half)}</div>
+      </div>
+    </div>`; })() : ''}
   </div>`).join('');
 
   gi('print-view').innerHTML = `

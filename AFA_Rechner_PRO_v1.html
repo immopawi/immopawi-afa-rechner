@@ -6550,8 +6550,8 @@ function generatePrintView() {
         ${row2('Familienstand', verheiratet ? 'Verheiratet / Zusammenveranlagung' : 'Ledig / Einzelveranlagung')}
         ${row2('Bruttoeinkommen', fmtV(brutto1) + ' / Jahr')}
         ${verheiratet && brutto2 ? row2('Einkommen Partner', fmtV(brutto2) + ' / Jahr') : ''}
-        ${row2('Bundesland (Wohnsitz)', kircheBl)}
         ${row2('Kirchensteuer', kirche ? 'Ja' : 'Nein')}
+        ${kirche ? row2('Bundesland (Wohnsitz)', kircheBl) : ''}
         ${row2('Kinder (Anzahl)', kinderCount > 0 ? kinderCount + (kinderCount===1?' Kind':' Kinder') : 'Keine')}
         ${kinderCount > 0 ? row2('Freibetrag-Aufteilung', kinderDetail) : ''}
         ${row2('Grenzsteuersatz (Jahr 1)', gzsVal + ' ' + gzsSub)}
